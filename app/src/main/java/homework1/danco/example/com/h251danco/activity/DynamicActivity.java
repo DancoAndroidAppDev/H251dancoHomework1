@@ -2,19 +2,17 @@ package homework1.danco.example.com.h251danco.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuItem;
 
 import homework1.danco.example.com.h251danco.DummyContent;
 import homework1.danco.example.com.h251danco.R;
 import homework1.danco.example.com.h251danco.fragment.DynamicFragment;
 
 public class DynamicActivity extends ActionBarActivity
-        implements DynamicFragment.OnFragmentInteractionListener{
+        implements DynamicFragment.DynamicFragmentListener {
 
     private static final String FRAGMENT_TAG = "ContactDetails";
     private static DummyContent.DummyItem ITEM;
@@ -52,7 +50,7 @@ public class DynamicActivity extends ActionBarActivity
 
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
+    public void onDatePickerOk() {
         // Alternately you could call finish() but that could cause problems.
         // This is coming in a future class
         NavUtils.navigateUpFromSameTask(this);

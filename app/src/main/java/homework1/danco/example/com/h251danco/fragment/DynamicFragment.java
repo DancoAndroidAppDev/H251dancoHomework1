@@ -2,7 +2,6 @@ package homework1.danco.example.com.h251danco.fragment;
 
 import android.app.Activity;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,6 +10,9 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 import homework1.danco.example.com.h251danco.DummyContent;
 import homework1.danco.example.com.h251danco.R;
 
@@ -18,26 +20,43 @@ import homework1.danco.example.com.h251danco.R;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link DynamicFragment.OnFragmentInteractionListener} interface
+ * {@link homework1.danco.example.com.h251danco.fragment.DynamicFragment.DynamicFragmentListener} interface
  * to handle interaction events.
  * Use the {@link DynamicFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DynamicFragment extends Fragment implements View.OnClickListener {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String CONTACT = "contact";
-    private static final String CONTACT_NAME = "name";
-    private static final String CONTACT_STREET_ADDRESS = "street_address";
-    private static final String CITY_STATE_ZIP = "city_state_zip";
+public class DynamicFragment extends Fragment
+        implements View.OnClickListener, DatePickerFragment.DatePickerFragmentListener {
+    public static final String DATE_PICKER_TAG = "date_picker";
+
+    public static final String CONTACT = "contact";
 
     private String contactId;
     private String contactName;
     private String contactStreetAddress;
     private String city, state, zip;
-    private String dob;
+    private int birthYear;
+    private int birthMonth;
+    private int birthDayOfMonth;
 
-    private OnFragmentInteractionListener mListener;
+    private final NumberFormat dayMonthFormat = new DecimalFormat("00");
+
+    private DynamicFragmentListener listener;
+
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface DynamicFragmentListener {
+        public void onDatePickerOk();
+    }
 
 
     public DynamicFragment() {
@@ -65,7 +84,7 @@ public class DynamicFragment extends Fragment implements View.OnClickListener {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            listener = (DynamicFragmentListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.getClass().getSimpleName()
                     + " must implement OnFragmentInteractionListener");
@@ -91,7 +110,9 @@ public class DynamicFragment extends Fragment implements View.OnClickListener {
         city= item.city;
         state = item.state;
         zip = item.zip;
-        dob = item.birthDate;
+        birthYear = item.birthYear;
+        birthMonth = item.birthMonth;
+        birthDayOfMonth = item.birthDayOfMonth;
     }
 
 
@@ -107,30 +128,25 @@ public class DynamicFragment extends Fragment implements View.OnClickListener {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ViewHolder holder = new ViewHolder(view);
-        view.setTag(view);
+        view.setTag(holder);
 
         holder.contactName.setText(contactName);
         holder.contactName.setTypeface(Typeface.DEFAULT_BOLD);
         holder.contactName.setOnClickListener(this);
         holder.streetAddress.setText(
                 String.format("%s\n%s, %s %s", contactStreetAddress, city, state, zip));
-        holder.dob.setText(dob);
+        holder.dob.setText(String.format("%s/%s/%s",
+                dayMonthFormat.format(birthYear),
+                dayMonthFormat.format(birthMonth),
+                dayMonthFormat.format(birthDayOfMonth)));
         holder.dob.setOnClickListener(this);
-    }
-
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
 
@@ -139,22 +155,39 @@ public class DynamicFragment extends Fragment implements View.OnClickListener {
 
         switch (v.getId()) {
             case R.id.contactDob:
+                DatePickerFragment fragment = DatePickerFragment.newInstance(2015, 1, 1);
+                fragment.show(getChildFragmentManager(), DATE_PICKER_TAG);
+                break;
         }
     }
 
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(Uri uri);
+    @Override
+    public void onOkSelected(int year, int month, int dayOfMonth) {
+        this.birthYear = year;
+        this.birthMonth = month;
+        this.birthDayOfMonth = dayOfMonth;
+
+        ViewHolder holder = getViewHolder();
+        if (holder != null) {
+            holder.dob.setText(String.format("%s/%s/%s",
+                    dayMonthFormat.format(birthYear),
+                    dayMonthFormat.format(birthMonth),
+                    dayMonthFormat.format(birthDayOfMonth)));
+        }
+    }
+
+
+    private ViewHolder getViewHolder() {
+        View view = getView();
+        // getView will return null after onDestroyView
+        return view != null ? (ViewHolder) view.getTag() : null;
+    }
+
+
+    @Override
+    public void onCancelSelected() {
+
     }
 
 

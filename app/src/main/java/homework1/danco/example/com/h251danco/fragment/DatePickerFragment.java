@@ -3,12 +3,14 @@ package homework1.danco.example.com.h251danco.fragment;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.widget.DatePicker;
+
+import homework1.danco.example.com.h251danco.DummyContent;
+import homework1.danco.example.com.h251danco.R;
 
 
 /**
@@ -20,7 +22,7 @@ import android.widget.DatePicker;
  * create an instance of this fragment.
  */
 public class DatePickerFragment extends DialogFragment
-        implements DialogInterface.OnClickListener, DatePickerDialog.OnDateSetListener {
+        implements DatePickerDialog.OnDateSetListener {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String BIRTH_YEAR = "year";
     private static final String BIRTH_MONTH = "month";
@@ -30,7 +32,7 @@ public class DatePickerFragment extends DialogFragment
     private int month;
     private int day;
 
-    private DatePickerFragmentListener mListener;
+    private DatePickerFragmentListener listener;
 
 
     /**
@@ -44,7 +46,7 @@ public class DatePickerFragment extends DialogFragment
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface DatePickerFragmentListener {
-        public void onOkSelected();
+        public void onOkSelected(int year, int month, int dayOfMonth);
         public void onCancelSelected();
     }
 
@@ -58,29 +60,27 @@ public class DatePickerFragment extends DialogFragment
      * @param day birth day of month.
      * @return A new instance of fragment DatePickerFragment.
      */
-    public static DatePickerFragment newInstance(String year, String month, String day) {
+    public static DatePickerFragment newInstance(int year, int month, int day) {
         DatePickerFragment fragment = new DatePickerFragment();
         Bundle args = new Bundle();
-        args.putString(BIRTH_YEAR, year);
-        args.putString(BIRTH_MONTH, month);
-        args.putString(BIRTH_DAY_OF_MONTH, day);
+        args.putInt(BIRTH_YEAR, year);
+        args.putInt(BIRTH_MONTH, month);
+        args.putInt(BIRTH_DAY_OF_MONTH, day);
         fragment.setArguments(args);
         return fragment;
-    }
-
-
-    public DatePickerFragment() {
-        // Required empty public constructor
     }
 
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        Fragment parent = getParentFragment();
+        Object objectToCast = parent != null ? parent : activity;
+
         try {
-            mListener = (DatePickerFragmentListener) activity;
+            listener = (DatePickerFragmentListener) objectToCast;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(activity.getClass().getSimpleName()
                     + " must implement DatePickerFragmentListener");
         }
     }
@@ -90,26 +90,36 @@ public class DatePickerFragment extends DialogFragment
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        return new DatePickerDialog(getActivity().getBaseContext(), this, year, month, day);
+        if (savedInstanceState == null) {
+            year = 2015;
+            month = 1;
+            day = 1;
+        } else {
+            DummyContent.DummyItem item =
+                    savedInstanceState.getParcelable(getResources().getString(R.string.contact));
+            year = item.birthYear;
+            month = item.birthMonth;
+            day = item.birthDayOfMonth;
+        }
+
+        return new DatePickerDialog(getActivity(), this, year, month, day);
     }
 
 
     @Override
     public void onDetach() {
+        listener = null;
         super.onDetach();
-        mListener = null;
-    }
-
-
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
-
     }
 
 
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+        this.year = year;
+        this.month = monthOfYear;
+        this.day = dayOfMonth;
 
+        listener.onOkSelected(year, monthOfYear, dayOfMonth);
     }
 
 

@@ -7,5 +7,6 @@
     <string name="main_activity_name">Xml Fragment</string>
     <string name="title_activity_dynamic">DynamicActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="contact">contact</string>
 
 </resources>

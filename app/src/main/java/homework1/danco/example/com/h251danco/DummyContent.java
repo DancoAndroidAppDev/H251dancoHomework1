@@ -48,7 +48,9 @@ public class DummyContent {
         public String city;
         public String state;
         public String zip;
-        public String birthDate;
+        public int birthYear;
+        public int birthMonth;
+        public int birthDayOfMonth;
 
         public DummyItem(String id, String name) {
             this.id = id;
@@ -57,7 +59,9 @@ public class DummyContent {
             city = "Seattle";
             state = "WA";
             zip = "98101";
-            birthDate = "01/05/2015";
+            birthYear = 2015;
+            birthMonth = 1;
+            birthDayOfMonth = 1;
         }
 
         @Override
