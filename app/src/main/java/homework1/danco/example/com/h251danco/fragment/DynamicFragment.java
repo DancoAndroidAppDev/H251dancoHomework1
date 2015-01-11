@@ -39,6 +39,8 @@ public class DynamicFragment extends Fragment
     private int birthMonth;
     private int birthDayOfMonth;
 
+    private DummyContent.DummyItem item;
+
     private final NumberFormat dayMonthFormat = new DecimalFormat("00");
 
     private DynamicFragmentListener listener;
@@ -76,6 +78,7 @@ public class DynamicFragment extends Fragment
         Bundle args = new Bundle();
         args.putParcelable(CONTACT, item);
         fragment.setArguments(args);
+        fragment.item = item;
         return fragment;
     }
 
@@ -96,7 +99,6 @@ public class DynamicFragment extends Fragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DummyContent.DummyItem item = null;
         if (savedInstanceState == null) {
             if (getArguments() != null) {
                 item = getArguments().getParcelable(CONTACT);
@@ -144,6 +146,14 @@ public class DynamicFragment extends Fragment
 
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(CONTACT, item);
+    }
+
+
+    @Override
     public void onDetach() {
         super.onDetach();
         listener = null;
@@ -167,6 +177,9 @@ public class DynamicFragment extends Fragment
         this.birthYear = year;
         this.birthMonth = month;
         this.birthDayOfMonth = dayOfMonth;
+        item.birthYear = year;
+        item.birthMonth = month;
+        item.birthDayOfMonth = dayOfMonth;
 
         ViewHolder holder = getViewHolder();
         if (holder != null) {
