@@ -77,7 +77,15 @@ public class DummyContent {
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
-
+            dest.writeString(id);
+            dest.writeString(name);
+            dest.writeString(streetAddress);
+            dest.writeString(city);
+            dest.writeString(state);
+            dest.writeString(zip);
+            dest.writeInt(birthYear);
+            dest.writeInt(birthMonth);
+            dest.writeInt(birthDayOfMonth);
         }
     }
 }
